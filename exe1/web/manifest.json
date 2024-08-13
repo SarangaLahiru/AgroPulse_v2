@@ -1,6 +1,6 @@
 {
-    "name": "exe1",
-    "short_name": "exe1",
+    "name": "exe2",
+    "short_name": "exe2",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
