@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "871077082111",
+    "firebase_url": "https://exe2-96fd1-default-rtdb.firebaseio.com",
+    "project_id": "exe2-96fd1",
+    "storage_bucket": "exe2-96fd1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:871077082111:android:84fccf63f91525a76dedca",
+        "android_client_info": {
+          "package_name": "exe.exe1"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAPWvj_n8TBQSehI0NfWFL3W6GFbPN9ayY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
