@@ -1,7 +1,9 @@
 import 'dart:convert';
 
+import 'package:exe2/model/user.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -43,11 +45,11 @@ class _LoginPageState extends State<LoginPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 255, 255, 255),
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text('Login'),
         backgroundColor: Color.fromARGB(255, 20, 171, 3),
-        foregroundColor: Color.fromARGB(255, 255, 255, 255),
+        foregroundColor: Colors.white,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -90,21 +92,35 @@ class _LoginPageState extends State<LoginPage>
                 SizedBox(height: 24),
                 ElevatedButton(
                   onPressed: () async {
-                    // Handle login logic
-                    final response = await _loginUser(
-                      _emailController.text,
-                      _passwordController.text,
-                    );
+                    _showLoadingIndicator(context);
+                    try {
+                      final response = await _loginUser(
+                        _emailController.text,
+                        _passwordController.text,
+                      );
+                      Navigator.pop(context); // Hide loading indicator
 
-                    if (response.statusCode == 200) {
-                      // Login successful
-                      Navigator.pushNamed(context, '/home');
-                    } else {
-                      // Show error message
-                      final Map<String, dynamic> responseData =
-                          json.decode(response.body);
-                      _showDialog(context, 'Error',
-                          responseData['message'] ?? 'Login failed');
+                      if (response.statusCode == 200) {
+                        final Map<String, dynamic> responseData =
+                            json.decode(response.body);
+                        final User user = User.fromJson(responseData['user']);
+                        Navigator.pushNamed(
+                          context,
+                          '/home',
+                          arguments: user,
+                        );
+                      } else {
+                        final Map<String, dynamic> responseData =
+                            json.decode(response.body);
+                        final String errors =
+                            _parseValidationErrors(responseData);
+                        await _showAlertErr(
+                            context, 'Validation Error', errors);
+                      }
+                    } catch (e) {
+                      Navigator.pop(context); // Hide loading indicator
+                      await _showAlertErr(
+                          context, 'Error', 'Failed to login: $e');
                     }
                   },
                   style: ElevatedButton.styleFrom(
@@ -168,32 +184,97 @@ class _LoginPageState extends State<LoginPage>
     );
   }
 
-  Future<http.Response> _loginUser(String email, String password) {
-    return http.post(
-      Uri.parse('http://127.0.0.1:8000/api/login'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
+  Future<http.Response> _loginUser(String email, String password) async {
+    try {
+      final response = await http.post(
+        Uri.parse('http://127.0.0.1:8000/api/login'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(<String, String>{
+          'email': email,
+          'password': password,
+        }),
+      );
+      return response;
+    } catch (e) {
+      throw Exception('Failed to login: $e');
+    }
+  }
+
+  Future<void> _showAlert(BuildContext context, String title, String message) {
+    return Alert(
+      context: context,
+      type: AlertType.success,
+      title: title,
+      desc: message,
+      buttons: [
+        DialogButton(
+          child: Text(
+            "OK",
+            style: TextStyle(color: Colors.white, fontSize: 20),
+          ),
+          onPressed: () => Navigator.pop(context),
+          color: Color.fromARGB(255, 0, 179, 134),
+        )
+      ],
+    ).show();
+  }
+
+  Future<void> _showAlertErr(
+      BuildContext context, String title, String message) {
+    return Alert(
+      context: context,
+      type: AlertType.error,
+      title: title,
+      desc: message,
+      buttons: [
+        DialogButton(
+          child: Text(
+            "OK",
+            style: TextStyle(color: Colors.white, fontSize: 20),
+          ),
+          onPressed: () => Navigator.pop(context),
+          color: Color.fromARGB(255, 0, 179, 134),
+        )
+      ],
+    ).show();
+  }
+
+  void _showLoadingIndicator(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              CircularProgressIndicator(
+                color: Color.fromARGB(255, 8, 141, 39), // Custom color
+                strokeWidth: 6.0, // Custom stroke width
+              ),
+              SizedBox(width: 20),
+              Text(
+                "Processing...",
+                style: TextStyle(
+                  fontSize: 16, // Custom font size
+                  color: Colors.black, // Custom text color
+                ),
+              ),
+            ],
+          ),
+        );
       },
-      body: jsonEncode(<String, String>{
-        'email': email,
-        'password': password,
-      }),
     );
   }
 
-  void _showDialog(BuildContext context, String title, String message) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(title),
-        content: Text(message),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('OK'),
-          ),
-        ],
-      ),
-    );
+  String _parseValidationErrors(Map<String, dynamic> responseData) {
+    final StringBuffer errorMessages = StringBuffer();
+    responseData.forEach((field, messages) {
+      errorMessages
+          .writeln('$field: ${List<String>.from(messages).join(', ')}');
+    });
+    return errorMessages.toString();
   }
 }
