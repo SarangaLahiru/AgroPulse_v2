@@ -18,7 +18,15 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Auth',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.green, // Primary color theme for your app
+        bottomNavigationBarTheme: BottomNavigationBarThemeData(
+          // Background color for BottomNavigationBar
+          selectedItemColor: Colors.white,
+          unselectedItemColor:
+              const Color.fromARGB(255, 223, 223, 223).withOpacity(0.6),
+          elevation: 5,
+        ),
+        // Define other theme properties as needed
       ),
       initialRoute: '/',
       routes: {
@@ -28,8 +36,10 @@ class MyApp extends StatelessWidget {
             HomePage(user: ModalRoute.of(context)!.settings.arguments as User),
         '/profile': (context) => ProfilePage(
             user: ModalRoute.of(context)!.settings.arguments as User),
-        '/settings': (context) => SettingsPage(),
-        '/pest-detection': (context) => PestDetectionPage(),
+        '/settings': (context) => SettingsPage(
+            user: ModalRoute.of(context)!.settings.arguments as User),
+        '/pest-detection': (context) => PestDetectionPage(
+            user: ModalRoute.of(context)!.settings.arguments as User),
       },
     );
   }
