@@ -13,7 +13,7 @@ class RegisterPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Create an Account'),
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: Color.fromARGB(255, 20, 171, 3),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -24,7 +24,7 @@ class RegisterPage extends StatelessWidget {
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: Colors.deepPurple,
+                color: const Color.fromARGB(255, 73, 183, 58),
               ),
               textAlign: TextAlign.center,
             ),
@@ -75,6 +75,12 @@ class RegisterPage extends StatelessWidget {
                 // primary: Colors.deepPurple,
 
                 padding: EdgeInsets.symmetric(vertical: 15),
+                backgroundColor: Color.fromARGB(
+                    255, 8, 141, 39), // Solid color instead of semi-transparent
+                foregroundColor: Colors.white, // Text color
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8), // Rounded corners
+                ),
               ),
               child: Text(
                 'Register',
@@ -108,7 +114,9 @@ class RegisterPage extends StatelessWidget {
       controller: controller,
       decoration: InputDecoration(
         labelText: labelText,
-        prefixIcon: icon != null ? Icon(icon, color: Colors.deepPurple) : null,
+        prefixIcon: icon != null
+            ? Icon(icon, color: Color.fromARGB(255, 13, 171, 76))
+            : null,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
         ),
