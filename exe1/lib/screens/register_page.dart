@@ -11,14 +11,20 @@ class RegisterPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color.fromARGB(255, 255, 255, 255),
       appBar: AppBar(
         title: Text('Create an Account'),
         backgroundColor: Color.fromARGB(255, 20, 171, 3),
+        foregroundColor: Color.fromARGB(255, 255, 255, 255),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: ListView(
           children: <Widget>[
+            Image.asset(
+              'assets/images/logo.jpeg',
+              height: 150,
+            ),
             Text(
               'Register',
               style: TextStyle(
@@ -94,7 +100,7 @@ class RegisterPage extends StatelessWidget {
               },
               child: Text(
                 'Already have an account? Login',
-                style: TextStyle(color: Colors.deepPurple),
+                style: TextStyle(color: Color.fromARGB(255, 4, 153, 34)),
               ),
             ),
           ],
@@ -118,7 +124,14 @@ class RegisterPage extends StatelessWidget {
             ? Icon(icon, color: Color.fromARGB(255, 13, 171, 76))
             : null,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(8.0),
+          borderSide: BorderSide(
+              color: Color.fromARGB(255, 18, 152, 8)), // Default border color
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8.0),
+          borderSide:
+              BorderSide(color: Colors.green), // Border color when focused
         ),
         filled: true,
         fillColor: Colors.grey[200],
