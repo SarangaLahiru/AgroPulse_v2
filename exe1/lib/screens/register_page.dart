@@ -200,9 +200,18 @@ class _RegisterPageState extends State<RegisterPage> {
           content: Row(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              CircularProgressIndicator(),
+              CircularProgressIndicator(
+                color: Color.fromARGB(255, 8, 141, 39), // Custom color
+                strokeWidth: 6.0, // Custom stroke width
+              ),
               SizedBox(width: 20),
-              Text("Processing..."),
+              Text(
+                "Processing...",
+                style: TextStyle(
+                  fontSize: 16, // Custom font size
+                  color: Colors.black, // Custom text color
+                ),
+              ),
             ],
           ),
         );
