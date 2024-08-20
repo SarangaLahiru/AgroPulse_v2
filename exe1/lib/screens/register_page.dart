@@ -18,11 +18,11 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 255, 255, 255),
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text('Create an Account'),
         backgroundColor: Color.fromARGB(255, 20, 171, 3),
-        foregroundColor: Color.fromARGB(255, 255, 255, 255),
+        foregroundColor: Colors.white,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -37,7 +37,7 @@ class _RegisterPageState extends State<RegisterPage> {
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: const Color.fromARGB(255, 73, 183, 58),
+                color: Color.fromARGB(255, 73, 183, 58),
               ),
               textAlign: TextAlign.center,
             ),
@@ -82,18 +82,24 @@ class _RegisterPageState extends State<RegisterPage> {
                   await _showAlert(
                       context, 'Success', 'Registration successful! Welcome.');
                   Navigator.pushNamed(context, '/home');
-                } else {
-                  // Show error message
+                } else if (response.statusCode == 422) {
+                  // Show validation errors
                   final Map<String, dynamic> responseData =
                       json.decode(response.body);
-                  await _showAlert(context, 'Error',
-                      responseData['message'] ?? 'Registration failed');
+                  final String errors = _parseValidationErrors(responseData);
+                  await _showAlertErr(context, 'Validation Error', errors);
+                } else {
+                  // Show general error message
+                  final String errorMessage = response.body.isNotEmpty
+                      ? json.decode(response.body)['message'] ??
+                          'Registration failed'
+                      : 'Registration failed';
+                  await _showAlertErr(context, 'Error', errorMessage);
                 }
               },
               style: ElevatedButton.styleFrom(
                 padding: EdgeInsets.symmetric(vertical: 15),
-                backgroundColor: Color.fromARGB(
-                    255, 8, 141, 39), // Solid color instead of semi-transparent
+                backgroundColor: Color.fromARGB(255, 8, 141, 39), // Solid color
                 foregroundColor: Colors.white, // Text color
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8), // Rounded corners
@@ -145,7 +151,7 @@ class _RegisterPageState extends State<RegisterPage> {
               BorderSide(color: Colors.green), // Border color when focused
         ),
         filled: true,
-        fillColor: const Color.fromARGB(255, 251, 251, 251),
+        fillColor: Color.fromARGB(255, 251, 251, 251),
       ),
       obscureText: obscureText,
       keyboardType: keyboardType,
@@ -175,7 +181,27 @@ class _RegisterPageState extends State<RegisterPage> {
   Future<void> _showAlert(BuildContext context, String title, String message) {
     return Alert(
       context: context,
-      type: AlertType.success, // or AlertType.error based on the message
+      type: AlertType.success,
+      title: title,
+      desc: message,
+      buttons: [
+        DialogButton(
+          child: Text(
+            "OK",
+            style: TextStyle(color: Colors.white, fontSize: 20),
+          ),
+          onPressed: () => Navigator.pop(context),
+          color: Color.fromARGB(255, 0, 179, 134),
+        )
+      ],
+    ).show();
+  }
+
+  Future<void> _showAlertErr(
+      BuildContext context, String title, String message) {
+    return Alert(
+      context: context,
+      type: AlertType.error,
       title: title,
       desc: message,
       buttons: [
@@ -217,5 +243,14 @@ class _RegisterPageState extends State<RegisterPage> {
         );
       },
     );
+  }
+
+  String _parseValidationErrors(Map<String, dynamic> responseData) {
+    final StringBuffer errorMessages = StringBuffer();
+    responseData.forEach((field, messages) {
+      errorMessages
+          .writeln('$field: ${List<String>.from(messages).join(', ')}');
+    });
+    return errorMessages.toString();
   }
 }

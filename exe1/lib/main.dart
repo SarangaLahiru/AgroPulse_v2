@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import './model/user.dart'; // Import the User model
 import 'screens/home_page.dart';
 import 'screens/login_page.dart';
 import 'screens/register_page.dart';
@@ -17,10 +18,20 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       initialRoute: '/',
-      routes: {
-        '/': (context) => LoginPage(),
-        '/register': (context) => RegisterPage(),
-        '/home': (context) => HomePage(),
+      onGenerateRoute: (RouteSettings settings) {
+        switch (settings.name) {
+          case '/':
+            return MaterialPageRoute(builder: (_) => LoginPage());
+          case '/register':
+            return MaterialPageRoute(builder: (_) => RegisterPage());
+          case '/home':
+            final User user = settings.arguments as User;
+            return MaterialPageRoute(
+              builder: (_) => HomePage(user: user),
+            );
+          default:
+            return MaterialPageRoute(builder: (_) => LoginPage());
+        }
       },
     );
   }
