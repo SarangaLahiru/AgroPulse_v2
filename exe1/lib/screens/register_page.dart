@@ -2,11 +2,18 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:rflutter_alert/rflutter_alert.dart';
 
-class RegisterPage extends StatelessWidget {
+class RegisterPage extends StatefulWidget {
+  @override
+  _RegisterPageState createState() => _RegisterPageState();
+}
+
+class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
+  bool _isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -57,6 +64,9 @@ class RegisterPage extends StatelessWidget {
             SizedBox(height: 24),
             ElevatedButton(
               onPressed: () async {
+                // Show loading indicator
+                _showLoadingIndicator(context);
+
                 // Handle registration logic
                 final response = await _registerUser(
                   _emailController.text,
@@ -64,22 +74,23 @@ class RegisterPage extends StatelessWidget {
                   _nameController.text,
                 );
 
+                // Hide loading indicator
+                Navigator.pop(context);
+
                 if (response.statusCode == 201) {
                   // Registration successful
-                  _showDialog(
+                  await _showAlert(
                       context, 'Success', 'Registration successful! Welcome.');
                   Navigator.pushNamed(context, '/home');
                 } else {
                   // Show error message
                   final Map<String, dynamic> responseData =
                       json.decode(response.body);
-                  _showDialog(context, 'Error',
+                  await _showAlert(context, 'Error',
                       responseData['message'] ?? 'Registration failed');
                 }
               },
               style: ElevatedButton.styleFrom(
-                // primary: Colors.deepPurple,
-
                 padding: EdgeInsets.symmetric(vertical: 15),
                 backgroundColor: Color.fromARGB(
                     255, 8, 141, 39), // Solid color instead of semi-transparent
@@ -134,7 +145,7 @@ class RegisterPage extends StatelessWidget {
               BorderSide(color: Colors.green), // Border color when focused
         ),
         filled: true,
-        fillColor: Colors.grey[200],
+        fillColor: const Color.fromARGB(255, 251, 251, 251),
       ),
       obscureText: obscureText,
       keyboardType: keyboardType,
@@ -161,19 +172,41 @@ class RegisterPage extends StatelessWidget {
     );
   }
 
-  void _showDialog(BuildContext context, String title, String message) {
+  Future<void> _showAlert(BuildContext context, String title, String message) {
+    return Alert(
+      context: context,
+      type: AlertType.success, // or AlertType.error based on the message
+      title: title,
+      desc: message,
+      buttons: [
+        DialogButton(
+          child: Text(
+            "OK",
+            style: TextStyle(color: Colors.white, fontSize: 20),
+          ),
+          onPressed: () => Navigator.pop(context),
+          color: Color.fromARGB(255, 0, 179, 134),
+        )
+      ],
+    ).show();
+  }
+
+  void _showLoadingIndicator(BuildContext context) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(title),
-        content: Text(message),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('OK'),
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              CircularProgressIndicator(),
+              SizedBox(width: 20),
+              Text("Processing..."),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
