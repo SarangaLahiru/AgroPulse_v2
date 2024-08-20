@@ -55,6 +55,9 @@ class _HomePageState extends State<HomePage>
       case 2:
         Navigator.pushNamed(context, '/settings', arguments: widget.user);
         break;
+      case 3:
+        Navigator.pushNamed(context, '/pest-detection', arguments: widget.user);
+        break;
       default:
         Navigator.pushNamed(context, '/home', arguments: widget.user);
     }
@@ -158,12 +161,9 @@ class _HomePageState extends State<HomePage>
                         onTap: () => _onItemTapped(2),
                       ),
                       _buildGridCard(
-                        icon: Icons.logout,
-                        label: 'Logout',
-                        onTap: () {
-                          Navigator.pushNamedAndRemoveUntil(
-                              context, '/', (route) => false);
-                        },
+                        icon: Icons.bug_report,
+                        label: 'Pest Detection',
+                        onTap: () => _onItemTapped(3),
                       ),
                     ],
                   ),
@@ -187,14 +187,20 @@ class _HomePageState extends State<HomePage>
             icon: Icon(Icons.settings),
             label: 'Settings',
           ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.bug_report),
+            label: 'Pest Detection',
+          ),
         ],
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
-        selectedItemColor: Colors.green, // Color for selected item
-        unselectedItemColor: Colors.grey, // Color for unselected items
+        selectedItemColor:
+            Color.fromARGB(255, 23, 183, 6), // Color for selected item
+        unselectedItemColor: Colors.white.withOpacity(
+            0.6), // Color for unselected items with some transparency
         showUnselectedLabels: true, // Show labels for unselected items
         backgroundColor:
-            Colors.white, // White background for BottomNavigationBar
+            Colors.green, // Background color for BottomNavigationBar
         elevation: 5, // Shadow for BottomNavigationBar
       ),
     );
